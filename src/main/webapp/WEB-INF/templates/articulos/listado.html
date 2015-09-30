@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>Artículos</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <div>
+            <form id="form-articulo">
+                <fieldset>
+                    <legend>Datos del artículo</legend>
+                    <div>
+                        <label>Código: <input type="text" name="codigo"></label>
+                    </div>
+                    <div>
+                        <label>Nombre: <input type="text" name="nombre"></label>
+                    </div>
+                    <div>
+                        <button type="submit">Guardar</button>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+        <div>
+            <table id="table-articulos">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Nombre</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                </tbody>
+            </table>
+        </div>
+        <script src="/jquery-1.11.3.min.js"></script>
+        <script type="text/javascript">
+            function llenarTabla() {
+                $.ajax({
+                    url: '/api/articulos',
+                    type: 'GET'
+                }).done(function(data) {
+                    var tbody = $('#table-articulos tbody');
+                    tbody.empty();
+                    $.each(data, function(i, articulo){
+                        var tr = $('<tr>');
+                        var td_codigo = $('<td>');
+                        td_codigo.html(articulo.codigo);
+                        var td_nombre = $('<td>');
+                        td_nombre.html(articulo.nombre);
+                        var td_acciones = $('<td>');
+                        var a_editar = $ ('<a href="#">Editar</a>');
+                        a_editar.on('click',function(event){
+                        $ajax({
+                            url: 'api/artivulos/'+ articulo.id,
+                            type: 'GET'
+                        })  .done (function (data){
+                            
+                                                
+                              });
+                        });
+                        tr.append(td_codigo);
+                        tr.append(td_nombre);
+                        tr.append(td_acciones);
+                        tbody.append(tr);
+                    });
+                });
+            }
+            $(document).ready(function() {
+                llenarTabla();
+            });
+            $('#form-articulo').on('submit', function(event) {
+                event.preventDefault();
+                var datos = $(this).serialize();
+                $.ajax({
+                    url: '/api/articulos',
+                    data: datos,
+                    type: 'POST'
+                }).done(function() {
+                    alert('El artículo fue guardado correctamente');
+                    $('input[name="codigo"]').val("");
+                    $('input[name="nombre"]').val("");
+                    llenarTabla();
+                }).fail(function() {
+                    alert('No se pudo guardar');
+                });
+            });
+        </script>
+    </body>
+</html>
